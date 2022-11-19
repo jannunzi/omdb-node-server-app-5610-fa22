@@ -1,36 +1,22 @@
-export let movies = [
-    {
-        _id: '123',
-        title: 'Avatar'
-    },
-    {
-        _id: '234',
-        title: 'Terminator'
-    },
-    {
-        _id: '345',
-        title: 'Aliens'
-    },
-    {
-        _id: '456',
-        title: 'Titanic'
-    },
-]
+import * as movieDao from './movies-dao.js'
+
 
 export const getMovies = () => movies;
 
 const MoviesController = (app) => {
 
-    const createMovie   = (req, res) => {
+    const createMovie   = async (req, res) => {
         const movie = req.body
-        movie["_id"] = (new Date()).getTime() + ''
-        movie["likes"] = 0
-        movie["liked"] = false
-        movies.push(movie)
-        res.send(movie)
+        // movie["_id"] = (new Date()).getTime() + ''
+        // movie["likes"] = 0
+        // movie["liked"] = false
+        // movies.push(movie)
+        const actualMovie = await movieDao.createMovie(movie)
+        res.send(actualMovie)
     }
-    const findAllMovies = (req, res) => {
-        res.send(movies)
+    const findAllMovies = async (req, res) => {
+        const moviesInDatabase = await movieDao.findAllMovies()
+        res.send(moviesInDatabase)
     }
     const updateMovie   = (req, res) => {
         const mid = req.params['mid']
@@ -43,11 +29,12 @@ const MoviesController = (app) => {
         }
         res.send(200)
     }
-    const deleteMovie   = (req, res) => {
+    const deleteMovie   = async (req, res) => {
         const mid = req.params['mid']
-        movies = movies.filter(
-            (m) => m._id !== mid)
-        res.send(200)
+        const status = await movieDao.deleteMovie(mid)
+        // movies = movies.filter(
+        //     (m) => m._id !== mid)
+        res.send(status)
     }
 
     app.post  ('/movies', createMovie)
