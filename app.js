@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 import express from 'express'
 import MoviesController from "./movies/movies-controller.js";
 import LikesController from "./likes/likes-controller.js";
+import UsersController from "./users/users-controller.js";
 import cors from 'cors'
 
 const options = {
@@ -21,4 +22,5 @@ app.use(cors())
 app.use(express.json())
 MoviesController(app)
 LikesController(app)
+UsersController(app)
 app.listen(4000)
