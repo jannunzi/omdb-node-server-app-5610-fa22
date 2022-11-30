@@ -18,37 +18,32 @@ const UsersController = (app) => {
 
     const register = async (req, res) => {
         const user = req.body;
-        if (!user.username) {
-            res.sendStatus(403)
-            return
-        }
         const existingUser = await userDao
             .findUserByUsername(user.username)
         if(existingUser) {
             res.sendStatus(403)
             return
         }
-        const newUser = await userDao.createUser(user)
-        req.session['currentUser']= newUser
-        res.json(newUser)
+        const currentUser = await userDao.createUser(user)
+        req.session['currentUser'] = currentUser
+        res.json(currentUser)
     }
 
     const login = async (req, res) => {
         const credentials = req.body
         const existingUser = await userDao
-            .findUserByCredentials(credentials.username, credentials.password)
+            .findUserByCredentials(
+                credentials.username, credentials.password)
         if(existingUser) {
-            currentUser = existingUser
+            req.session['currentUser'] = existingUser
             res.json(existingUser)
             return
         }
-        else {
-            res.sendStatus(403)
-        }
+        res.sendStatus(403)
     }
 
     const logout = (req, res) => {
-        currentUser = null
+        req.session.destroy()
         res.sendStatus(200)
     }
 
@@ -60,7 +55,18 @@ const UsersController = (app) => {
         }
     }
 
+    const findUserById = async (req, res) => {
+        const uid = req.params.uid
+        const user = await userDao.findUserById(uid)
+        if (user) {
+            res.json(user)
+            return
+        }
+        res.sendStatus(404)
+    }
+
     app.get('/users', findAllUsers)
+    app.get('/users/:uid', findUserById)
     app.post('/users', createUser)
     app.put('/users/:uid', updateUser)
     app.delete('/users/:uid', deleteUser)
