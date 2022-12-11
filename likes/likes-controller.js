@@ -25,7 +25,8 @@ const LikesController = (app) => {
         return populatedResults
     }
     const userLikesMovie = async (req, res) => {
-        const uid = req.params.uid
+        // const uid = req.params.uid
+        const uid = req.session['currentUser']._id
         const mid = req.params.mid
 
         const newLike = await likesDao.userLikesMovie(uid, mid)
@@ -33,8 +34,11 @@ const LikesController = (app) => {
         res.json(newLike)
     }
     const userUnlikesMovie = async (req, res) => {
-        const uid = req.params.uid
-        const mid = req.params.mid
+        // const uid = req.params.uid
+        // const mid = req.params.mid
+
+        const {uid, mid} = req.params
+
         const status = await likesDao.userUnlikesMovie(uid, mid)
 
         // likes = likes.filter((l) => l.user !== uid && l.movie !== mid)
@@ -72,8 +76,8 @@ const LikesController = (app) => {
         // res.json(populateUsers)
     }
 
-    app.post('/users/:uid/likes/:mid', userLikesMovie)
-    app.delete('/users/:uid/unlikes/:mid', userUnlikesMovie)
+    app.post('/users/likes/:mid', userLikesMovie)
+    app.delete('/users/unlikes/:mid', userUnlikesMovie)
     app.get('/likes', findAllLikes)
     app.get('/users/:uid/likes', findMoviesLikedByUser)
     app.get('/movies/:mid/likes', findUsersWhoLikedMovie)
